@@ -4,7 +4,7 @@ import "github.com/eriicafes/go-api-starter/models"
 
 type BucketsService interface {
 	Get(userId int) (*models.Bucket, error)
-	Put(userId int, bucket models.Bucket) *models.Bucket
+	Put(userId int, bucketData models.Bucket) *models.Bucket
 }
 
 type BucketsRepository interface {

@@ -29,17 +29,17 @@ func (s *bucketsService) Get(userId int) (*models.Bucket, error) {
 	return nil, errors.New("bucket not found")
 }
 
-func (s *bucketsService) Put(userId int, bucket models.Bucket) *models.Bucket {
+func (s *bucketsService) Put(userId int, bucketData models.Bucket) *models.Bucket {
 	buckets := s.bucketsRepository.FindAll(userId)
 
 	for _, bucket := range buckets {
 		if *bucket.UserID == filedb.ID(userId) {
-			updatedBucket, _ := s.bucketsRepository.Update(userId, int(bucket.ID), bucket)
+			updatedBucket, _ := s.bucketsRepository.Update(userId, int(bucket.ID), bucketData)
 			return updatedBucket
 		}
 	}
 
-	newBucket := s.bucketsRepository.Create(userId, bucket)
+	newBucket := s.bucketsRepository.Create(userId, bucketData)
 
 	return newBucket
 }
