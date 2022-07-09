@@ -3,7 +3,6 @@ package buckets
 import (
 	"errors"
 
-	"github.com/eriicafes/filedb"
 	"github.com/eriicafes/go-api-starter/models"
 )
 
@@ -17,11 +16,11 @@ func NewBucketsService(bucketsRepository BucketsRepository) *bucketsService {
 	}
 }
 
-func (s *bucketsService) Get(userId int) (*models.Bucket, error) {
-	buckets := s.bucketsRepository.FindAll(userId)
+func (s *bucketsService) Get(accountId string) (*models.Bucket, error) {
+	buckets := s.bucketsRepository.FindAll(accountId)
 
 	for _, bucket := range buckets {
-		if *bucket.UserID == filedb.ID(userId) {
+		if *bucket.AccountID == accountId {
 			return &bucket, nil
 		}
 	}
@@ -29,17 +28,17 @@ func (s *bucketsService) Get(userId int) (*models.Bucket, error) {
 	return nil, errors.New("bucket not found")
 }
 
-func (s *bucketsService) Put(userId int, bucketData models.Bucket) *models.Bucket {
-	buckets := s.bucketsRepository.FindAll(userId)
+func (s *bucketsService) Put(accountId string, bucketData models.Bucket) *models.Bucket {
+	buckets := s.bucketsRepository.FindAll(accountId)
 
 	for _, bucket := range buckets {
-		if *bucket.UserID == filedb.ID(userId) {
-			updatedBucket, _ := s.bucketsRepository.Update(userId, int(bucket.ID), bucketData)
+		if *bucket.AccountID == accountId {
+			updatedBucket, _ := s.bucketsRepository.Update(accountId, int(bucket.ID), bucketData)
 			return updatedBucket
 		}
 	}
 
-	newBucket := s.bucketsRepository.Create(userId, bucketData)
+	newBucket := s.bucketsRepository.Create(accountId, bucketData)
 
 	return newBucket
 }

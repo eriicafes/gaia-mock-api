@@ -10,16 +10,16 @@ import (
 const BucketResource = "buckets"
 
 type Bucket struct {
-	ID        filedb.ID         `json:"id"`
-	Data      interface{}       `json:"data"`
-	CreatedAt time.Time         `json:"createdAt"`
-	UpdatedAt time.Time         `json:"updatedAt"`
-	UserID    filedb.ForeignKey `json:"userId"`
+	ID        filedb.ID   `json:"id"`
+	Data      interface{} `json:"data"`
+	CreatedAt time.Time   `json:"createdAt"`
+	UpdatedAt time.Time   `json:"updatedAt"`
+	AccountID *string     `json:"accountId"`
 }
 
 type BucketQuery struct {
-	ID     int
-	UserID int
+	ID        int
+	AccountID string
 }
 
 type bucketModel struct {
@@ -41,12 +41,12 @@ func matchBucketQuery(bucket Bucket, query *BucketQuery) bool {
 	}
 
 	matchUserID := func() bool {
-		if bucket.UserID != nil {
-			return *bucket.UserID == filedb.ID(query.UserID)
+		if bucket.AccountID != nil {
+			return *bucket.AccountID == query.AccountID
 		}
 		return false
 	}()
-	if query.UserID == 0 {
+	if query.AccountID == "" {
 		matchUserID = true
 	}
 
@@ -136,8 +136,8 @@ func (m *bucketModel) UpdateBucket(query *BucketQuery, updatedBucket Bucket) (*B
 			updatedBucket.ID = bucket.ID
 			updatedBucket.CreatedAt = bucket.CreatedAt
 			updatedBucket.UpdatedAt = time.Now()
-			if updatedBucket.UserID == nil {
-				updatedBucket.UserID = bucket.UserID
+			if updatedBucket.AccountID == nil {
+				updatedBucket.AccountID = bucket.AccountID
 			}
 
 			newBuckets = append(newBuckets, updatedBucket)

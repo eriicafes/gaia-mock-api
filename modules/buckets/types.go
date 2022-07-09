@@ -3,14 +3,14 @@ package buckets
 import "github.com/eriicafes/go-api-starter/models"
 
 type BucketsService interface {
-	Get(userId int) (*models.Bucket, error)
-	Put(userId int, bucketData models.Bucket) *models.Bucket
+	Get(accountId string) (*models.Bucket, error)
+	Put(accountId string, bucketData models.Bucket) *models.Bucket
 }
 
 type BucketsRepository interface {
-	FindAll(userId int) []models.Bucket
-	FindOne(userId int, id int) (*models.Bucket, error)
-	Create(userId int, bucket models.Bucket) *models.Bucket
-	Update(userId int, id int, bucket models.Bucket) (*models.Bucket, error)
-	Remove(userId int, id int) error
+	FindAll(accountId string) []models.Bucket
+	FindOne(accountId string, id int) (*models.Bucket, error)
+	Create(accountId string, bucket models.Bucket) *models.Bucket
+	Update(accountId string, id int, bucket models.Bucket) (*models.Bucket, error)
+	Remove(accountId string, id int) error
 }

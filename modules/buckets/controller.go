@@ -28,7 +28,7 @@ func (c *bucketsController) Get(ctx *gin.Context) {
 
 	user := ctx.MustGet("auth").(*models.User)
 
-	bucket, err := c.bucketsService.Get(int(user.ID))
+	bucket, err := c.bucketsService.Get(user.AccountID)
 
 	if err != nil {
 		res.SetStatusMessage(http.StatusNotFound, err.Error()).ErrJSON()
@@ -56,7 +56,7 @@ func (c *bucketsController) Put(ctx *gin.Context) {
 		Data: bucketDto.Data,
 	}
 
-	bucket := c.bucketsService.Put(int(user.ID), bucketData)
+	bucket := c.bucketsService.Put(user.AccountID, bucketData)
 
 	res.SetData(bucket).JSON()
 }
