@@ -39,8 +39,27 @@ func (r *authRepository) Create(user models.User) *models.User {
 
 func (r *authRepository) RemoveByAccountId(accountId string) error {
 	model := models.NewUserModel(r.db)
+	bucketModel := models.NewBucketModel(r.db)
 
-	return model.RemoveOneUser(&models.UserQuery{
+	user, err := model.FindOneUser(&models.UserQuery{
 		AccountID: accountId,
 	})
+
+	if err != nil {
+		return err
+	}
+
+	model.RemoveOneUser(&models.UserQuery{
+		AccountID: user.AccountID,
+	})
+
+	err = bucketModel.RemoveOneBucket(&models.BucketQuery{
+		UserID: int(user.ID),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
