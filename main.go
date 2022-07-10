@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/eriicafes/filedb"
 	"github.com/eriicafes/go-api-starter/controller"
@@ -31,13 +30,13 @@ func main() {
 		ctx.JSON(http.StatusOK, gin.H{"ping": "pong"})
 	})
 
-	router.POST("/auth/signin", middlewares.UseDelay(time.Second*2), authController.SignIn)
-	router.POST("/auth/signout", middlewares.UseDelay(time.Second*2), middlewares.UseAuth(authService), authController.SignOut)
-	router.GET("/auth/profile", middlewares.UseDelay(time.Second*2), middlewares.UseAuth(authService), authController.Profile)
+	router.POST("/auth/signin", authController.SignIn)
+	router.POST("/auth/signout", middlewares.UseAuth(authService), authController.SignOut)
+	router.GET("/auth/profile", middlewares.UseAuth(authService), authController.Profile)
 
 	binder := controller.NewBinder(router)
 
-	binder.Bind("/buckets", bucketsController, middlewares.UseDelay(time.Second*4), middlewares.UseAuth(authService))
+	binder.Bind("/buckets", bucketsController, middlewares.UseAuth(authService))
 
 	router.Run()
 }
