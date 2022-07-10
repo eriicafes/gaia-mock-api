@@ -25,14 +25,6 @@ type UserQuery struct {
 	Name      string
 }
 
-type userModel struct {
-	db *filedb.Database
-}
-
-func NewUserModel(db *filedb.Database) *userModel {
-	return &userModel{db}
-}
-
 func matchUserQuery(user User, query *UserQuery) bool {
 	if query == nil {
 		return true
@@ -56,7 +48,7 @@ func matchUserQuery(user User, query *UserQuery) bool {
 	return matchID && matchAccountID && matchName
 }
 
-func generateId() string {
+func generateUserId() string {
 	bytes := make([]byte, 21)
 
 	rand.Read(bytes)
@@ -64,7 +56,7 @@ func generateId() string {
 	return fmt.Sprintf("ga-%x", bytes)
 }
 
-func (m *userModel) get() []User {
+func (m *model) getUsers() []User {
 	var users []User
 
 	m.db.Get(UserResource, &users)
@@ -72,7 +64,7 @@ func (m *userModel) get() []User {
 	return users
 }
 
-func (m *userModel) set(users []User) {
+func (m *model) setUsers(users []User) {
 	data := make([]interface{}, 0, len(users))
 
 	for _, user := range users {
@@ -82,8 +74,8 @@ func (m *userModel) set(users []User) {
 	m.db.Set(UserResource, data)
 }
 
-func (m *userModel) FindOneUser(query *UserQuery) (*User, error) {
-	users := m.get()
+func (m *model) FindOneUser(query *UserQuery) (*User, error) {
+	users := m.getUsers()
 
 	for _, user := range users {
 		match := matchUserQuery(user, query)
@@ -96,8 +88,8 @@ func (m *userModel) FindOneUser(query *UserQuery) (*User, error) {
 	return nil, errors.New("user not found")
 }
 
-func (m *userModel) FindManyUsers(query *UserQuery) []User {
-	users := m.get()
+func (m *model) FindManyUsers(query *UserQuery) []User {
+	users := m.getUsers()
 	var result []User
 
 	for _, user := range users {
@@ -111,24 +103,24 @@ func (m *userModel) FindManyUsers(query *UserQuery) []User {
 	return result
 }
 
-func (m *userModel) CreateUser(user User) *User {
-	users := m.get()
+func (m *model) CreateUser(user User) *User {
+	users := m.getUsers()
 
 	// override fields
 	user.ID = filedb.ID(len(users) + 1)
-	user.AccountID = generateId()
+	user.AccountID = generateUserId()
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 
 	users = append(users, user)
 
-	m.set(users)
+	m.setUsers(users)
 
 	return &user
 }
 
-func (m *userModel) UpdateUser(query *UserQuery, updatedUser User) (*User, error) {
-	users := m.get()
+func (m *model) UpdateUser(query *UserQuery, updatedUser User) (*User, error) {
+	users := m.getUsers()
 	var newUsers []User
 
 	var updated bool
@@ -161,12 +153,12 @@ func (m *userModel) UpdateUser(query *UserQuery, updatedUser User) (*User, error
 		return nil, errors.New("user not found")
 	}
 
-	m.set(newUsers)
+	m.setUsers(newUsers)
 	return &updatedUser, nil
 }
 
-func (m *userModel) RemoveOneUser(query *UserQuery) error {
-	users := m.get()
+func (m *model) RemoveOneUser(query *UserQuery) error {
+	users := m.getUsers()
 	var newUsers []User
 
 	var removed bool
@@ -191,12 +183,12 @@ func (m *userModel) RemoveOneUser(query *UserQuery) error {
 		return errors.New("user not found")
 	}
 
-	m.set(newUsers)
+	m.setUsers(newUsers)
 	return nil
 }
 
-func (m *userModel) RemoveManyUsers(query *UserQuery) (int, error) {
-	users := m.get()
+func (m *model) RemoveManyUsers(query *UserQuery) (int, error) {
+	users := m.getUsers()
 	var newUsers []User
 
 	var count int
@@ -216,7 +208,7 @@ func (m *userModel) RemoveManyUsers(query *UserQuery) (int, error) {
 		return count, errors.New("users not found")
 	}
 
-	m.set(newUsers)
+	m.setUsers(newUsers)
 
 	return count, nil
 }

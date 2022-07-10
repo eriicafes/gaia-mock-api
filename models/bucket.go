@@ -22,14 +22,6 @@ type BucketQuery struct {
 	AccountID string
 }
 
-type bucketModel struct {
-	db *filedb.Database
-}
-
-func NewBucketModel(db *filedb.Database) *bucketModel {
-	return &bucketModel{db}
-}
-
 func matchBucketQuery(bucket Bucket, query *BucketQuery) bool {
 	if query == nil {
 		return true
@@ -53,7 +45,7 @@ func matchBucketQuery(bucket Bucket, query *BucketQuery) bool {
 	return matchID && matchUserID
 }
 
-func (m *bucketModel) get() []Bucket {
+func (m *model) getBuckets() []Bucket {
 	var buckets []Bucket
 
 	m.db.Get(BucketResource, &buckets)
@@ -61,7 +53,7 @@ func (m *bucketModel) get() []Bucket {
 	return buckets
 }
 
-func (m *bucketModel) set(buckets []Bucket) {
+func (m *model) setBuckets(buckets []Bucket) {
 	data := make([]interface{}, 0, len(buckets))
 
 	for _, bucket := range buckets {
@@ -71,8 +63,8 @@ func (m *bucketModel) set(buckets []Bucket) {
 	m.db.Set(BucketResource, data)
 }
 
-func (m *bucketModel) FindOneBucket(query *BucketQuery) (*Bucket, error) {
-	buckets := m.get()
+func (m *model) FindOneBucket(query *BucketQuery) (*Bucket, error) {
+	buckets := m.getBuckets()
 
 	for _, bucket := range buckets {
 		match := matchBucketQuery(bucket, query)
@@ -85,8 +77,8 @@ func (m *bucketModel) FindOneBucket(query *BucketQuery) (*Bucket, error) {
 	return nil, errors.New("bucket not found")
 }
 
-func (m *bucketModel) FindManyBuckets(query *BucketQuery) []Bucket {
-	buckets := m.get()
+func (m *model) FindManyBuckets(query *BucketQuery) []Bucket {
+	buckets := m.getBuckets()
 	var result []Bucket
 
 	for _, bucket := range buckets {
@@ -100,8 +92,8 @@ func (m *bucketModel) FindManyBuckets(query *BucketQuery) []Bucket {
 	return result
 }
 
-func (m *bucketModel) CreateBucket(bucket Bucket) *Bucket {
-	buckets := m.get()
+func (m *model) CreateBucket(bucket Bucket) *Bucket {
+	buckets := m.getBuckets()
 
 	// override fields
 	bucket.ID = filedb.ID(len(buckets) + 1)
@@ -110,13 +102,13 @@ func (m *bucketModel) CreateBucket(bucket Bucket) *Bucket {
 
 	buckets = append(buckets, bucket)
 
-	m.set(buckets)
+	m.setBuckets(buckets)
 
 	return &bucket
 }
 
-func (m *bucketModel) UpdateBucket(query *BucketQuery, updatedBucket Bucket) (*Bucket, error) {
-	buckets := m.get()
+func (m *model) UpdateBucket(query *BucketQuery, updatedBucket Bucket) (*Bucket, error) {
+	buckets := m.getBuckets()
 	var newBuckets []Bucket
 
 	var updated bool
@@ -151,12 +143,12 @@ func (m *bucketModel) UpdateBucket(query *BucketQuery, updatedBucket Bucket) (*B
 		return nil, errors.New("bucket not found")
 	}
 
-	m.set(newBuckets)
+	m.setBuckets(newBuckets)
 	return &updatedBucket, nil
 }
 
-func (m *bucketModel) RemoveOneBucket(query *BucketQuery) error {
-	buckets := m.get()
+func (m *model) RemoveOneBucket(query *BucketQuery) error {
+	buckets := m.getBuckets()
 	var newBuckets []Bucket
 
 	var removed bool
@@ -181,12 +173,12 @@ func (m *bucketModel) RemoveOneBucket(query *BucketQuery) error {
 		return errors.New("bucket not found")
 	}
 
-	m.set(newBuckets)
+	m.setBuckets(newBuckets)
 	return nil
 }
 
-func (m *bucketModel) RemoveManyBuckets(query *BucketQuery) (int, error) {
-	buckets := m.get()
+func (m *model) RemoveManyBuckets(query *BucketQuery) (int, error) {
+	buckets := m.getBuckets()
 	var newBuckets []Bucket
 
 	var count int
@@ -206,7 +198,7 @@ func (m *bucketModel) RemoveManyBuckets(query *BucketQuery) (int, error) {
 		return count, errors.New("buckets not found")
 	}
 
-	m.set(newBuckets)
+	m.setBuckets(newBuckets)
 
 	return count, nil
 }

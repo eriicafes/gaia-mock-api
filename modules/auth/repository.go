@@ -16,7 +16,7 @@ func NewAuthRepository(db *filedb.Database) *authRepository {
 }
 
 func (r *authRepository) FindOne(id int) (*models.User, error) {
-	model := models.NewUserModel(r.db)
+	model := models.New(r.db)
 
 	return model.FindOneUser(&models.UserQuery{
 		ID: id,
@@ -24,7 +24,7 @@ func (r *authRepository) FindOne(id int) (*models.User, error) {
 }
 
 func (r *authRepository) FindByAccountId(accountId string) (*models.User, error) {
-	model := models.NewUserModel(r.db)
+	model := models.New(r.db)
 
 	return model.FindOneUser(&models.UserQuery{
 		AccountID: accountId,
@@ -32,14 +32,13 @@ func (r *authRepository) FindByAccountId(accountId string) (*models.User, error)
 }
 
 func (r *authRepository) Create(user models.User) *models.User {
-	model := models.NewUserModel(r.db)
+	model := models.New(r.db)
 
 	return model.CreateUser(user)
 }
 
 func (r *authRepository) RemoveByAccountId(accountId string) error {
-	model := models.NewUserModel(r.db)
-	bucketModel := models.NewBucketModel(r.db)
+	model := models.New(r.db)
 
 	err := model.RemoveOneUser(&models.UserQuery{
 		AccountID: accountId,
@@ -49,7 +48,7 @@ func (r *authRepository) RemoveByAccountId(accountId string) error {
 		return err
 	}
 
-	bucketModel.RemoveOneBucket(&models.BucketQuery{
+	model.RemoveOneBucket(&models.BucketQuery{
 		AccountID: accountId,
 	})
 

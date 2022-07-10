@@ -16,13 +16,13 @@ func NewBucketsRepository(db *filedb.Database) *bucketsRepository {
 }
 
 func (r *bucketsRepository) FindAll() []models.Bucket {
-	model := models.NewBucketModel(r.db)
+	model := models.New(r.db)
 
 	return model.FindManyBuckets(nil)
 }
 
 func (r *bucketsRepository) FindOne(accountId string, id int) (*models.Bucket, error) {
-	model := models.NewBucketModel(r.db)
+	model := models.New(r.db)
 
 	return model.FindOneBucket(&models.BucketQuery{
 		AccountID: accountId,
@@ -31,7 +31,7 @@ func (r *bucketsRepository) FindOne(accountId string, id int) (*models.Bucket, e
 }
 
 func (r *bucketsRepository) Create(accountId string, bucket models.Bucket) *models.Bucket {
-	model := models.NewBucketModel(r.db)
+	model := models.New(r.db)
 
 	bucket.AccountID = &accountId
 
@@ -39,7 +39,7 @@ func (r *bucketsRepository) Create(accountId string, bucket models.Bucket) *mode
 }
 
 func (r *bucketsRepository) Update(accountId string, id int, bucket models.Bucket) (*models.Bucket, error) {
-	model := models.NewBucketModel(r.db)
+	model := models.New(r.db)
 
 	return model.UpdateBucket(&models.BucketQuery{
 		AccountID: accountId,
@@ -48,7 +48,7 @@ func (r *bucketsRepository) Update(accountId string, id int, bucket models.Bucke
 }
 
 func (r *bucketsRepository) Remove(accountId string, id int) error {
-	model := models.NewBucketModel(r.db)
+	model := models.New(r.db)
 
 	return model.RemoveOneBucket(&models.BucketQuery{
 		AccountID: accountId,
