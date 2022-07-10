@@ -32,17 +32,17 @@ func matchBucketQuery(bucket Bucket, query *BucketQuery) bool {
 		matchID = true
 	}
 
-	matchUserID := func() bool {
+	matchAccountID := func() bool {
 		if bucket.AccountID != nil {
 			return *bucket.AccountID == query.AccountID
 		}
 		return false
 	}()
 	if query.AccountID == "" {
-		matchUserID = true
+		matchAccountID = true
 	}
 
-	return matchID && matchUserID
+	return matchID && matchAccountID
 }
 
 func (m *model) getBuckets() []Bucket {
