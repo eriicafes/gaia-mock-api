@@ -11,6 +11,7 @@ const BucketResource = "buckets"
 
 type Bucket struct {
 	ID        filedb.ID   `json:"id"`
+	Name      string      `json:"name"`
 	Data      interface{} `json:"data"`
 	CreatedAt time.Time   `json:"createdAt"`
 	UpdatedAt time.Time   `json:"updatedAt"`
@@ -19,6 +20,7 @@ type Bucket struct {
 
 type BucketQuery struct {
 	ID        int
+	Name      string
 	AccountID string
 }
 
@@ -32,6 +34,11 @@ func matchBucketQuery(bucket Bucket, query *BucketQuery) bool {
 		matchID = true
 	}
 
+	matchName := bucket.Name == query.Name
+	if query.Name == "" {
+		matchName = true
+	}
+
 	matchAccountID := func() bool {
 		if bucket.AccountID != nil {
 			return *bucket.AccountID == query.AccountID
@@ -42,7 +49,7 @@ func matchBucketQuery(bucket Bucket, query *BucketQuery) bool {
 		matchAccountID = true
 	}
 
-	return matchID && matchAccountID
+	return matchID && matchName && matchAccountID
 }
 
 func (m *model) getBuckets() []Bucket {
@@ -126,6 +133,7 @@ func (m *model) UpdateBucket(query *BucketQuery, updatedBucket Bucket) (*Bucket,
 
 			// override fields
 			updatedBucket.ID = bucket.ID
+			updatedBucket.Name = bucket.Name
 			updatedBucket.CreatedAt = bucket.CreatedAt
 			updatedBucket.UpdatedAt = time.Now()
 			if updatedBucket.AccountID == nil {

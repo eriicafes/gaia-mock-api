@@ -15,10 +15,12 @@ func NewBucketsRepository(db *filedb.Database) *bucketsRepository {
 	}
 }
 
-func (r *bucketsRepository) FindAll() []models.Bucket {
+func (r *bucketsRepository) FindAll(accountId string) []models.Bucket {
 	model := models.New(r.db)
 
-	return model.FindManyBuckets(nil)
+	return model.FindManyBuckets(&models.BucketQuery{
+		AccountID: accountId,
+	})
 }
 
 func (r *bucketsRepository) FindOne(accountId string, id int) (*models.Bucket, error) {

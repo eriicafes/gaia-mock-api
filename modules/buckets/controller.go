@@ -19,15 +19,23 @@ func NewBucketsController(bucketsService BucketsService) *bucketsController {
 }
 
 func (c *bucketsController) Routes(r *gin.RouterGroup) {
-	r.GET("", c.Get)
-	r.PUT("", c.Put)
-	r.GET("/all", c.GetAll)
+	r.GET("/:accountId", c.GetAll)
+	r.GET("/:accountId/:name", c.Get)
+	r.PUT("/:accountId/:name", c.Put)
 }
 
 func (c *bucketsController) GetAll(ctx *gin.Context) {
 	res := response.New(ctx)
+	user := ctx.MustGet("auth").(*models.User)
 
-	buckets := c.bucketsService.GetAll()
+	// users can only access their bucket list
+	accountId := ctx.Param("accountId")
+	if accountId != user.AccountID {
+		res.SetStatus(http.StatusUnauthorized).ErrJSON()
+		return
+	}
+
+	buckets := c.bucketsService.GetAll(accountId)
 
 	if buckets == nil {
 		buckets = []models.Bucket{}
@@ -39,9 +47,11 @@ func (c *bucketsController) GetAll(ctx *gin.Context) {
 func (c *bucketsController) Get(ctx *gin.Context) {
 	res := response.New(ctx)
 
-	user := ctx.MustGet("auth").(*models.User)
+	// other authorized users can access a user's bucket
+	name := ctx.Param("name")
+	accountId := ctx.Param("accountId")
 
-	bucket, err := c.bucketsService.Get(user.AccountID)
+	bucket, err := c.bucketsService.Get(accountId, name)
 
 	if err != nil {
 		res.SetStatusMessage(http.StatusNotFound, err.Error()).ErrJSON()
@@ -53,8 +63,15 @@ func (c *bucketsController) Get(ctx *gin.Context) {
 
 func (c *bucketsController) Put(ctx *gin.Context) {
 	res := response.New(ctx)
-
 	user := ctx.MustGet("auth").(*models.User)
+
+	// users can only modify their bucket
+	name := ctx.Param("name")
+	accountId := ctx.Param("accountId")
+	if accountId != user.AccountID {
+		res.SetStatus(http.StatusUnauthorized).ErrJSON()
+		return
+	}
 
 	var bucketDto struct {
 		Data interface{} `json:"data" binding:"required"`
@@ -69,7 +86,7 @@ func (c *bucketsController) Put(ctx *gin.Context) {
 		Data: bucketDto.Data,
 	}
 
-	bucket := c.bucketsService.Put(user.AccountID, bucketData)
+	bucket := c.bucketsService.Put(user.AccountID, name, bucketData)
 
 	res.SetData(bucket).JSON()
 }
