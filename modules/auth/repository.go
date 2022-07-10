@@ -34,6 +34,14 @@ func (r *authRepository) FindByAccountId(accountId string) (*models.User, error)
 func (r *authRepository) Create(user models.User) *models.User {
 	model := models.New(r.db)
 
+	existingUser, err := model.FindOneUser(&models.UserQuery{
+		Name: user.Name,
+	})
+
+	if err == nil {
+		return existingUser
+	}
+
 	return model.CreateUser(user)
 }
 
