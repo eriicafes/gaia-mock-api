@@ -16,8 +16,14 @@ func NewBucketsService(bucketsRepository BucketsRepository) *bucketsService {
 	}
 }
 
+func (s *bucketsService) GetAll() []models.Bucket {
+	buckets := s.bucketsRepository.FindAll()
+
+	return buckets
+}
+
 func (s *bucketsService) Get(accountId string) (*models.Bucket, error) {
-	buckets := s.bucketsRepository.FindAll(accountId)
+	buckets := s.bucketsRepository.FindAll()
 
 	for _, bucket := range buckets {
 		if *bucket.AccountID == accountId {
@@ -29,7 +35,7 @@ func (s *bucketsService) Get(accountId string) (*models.Bucket, error) {
 }
 
 func (s *bucketsService) Put(accountId string, bucketData models.Bucket) *models.Bucket {
-	buckets := s.bucketsRepository.FindAll(accountId)
+	buckets := s.bucketsRepository.FindAll()
 
 	for _, bucket := range buckets {
 		if *bucket.AccountID == accountId {

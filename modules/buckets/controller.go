@@ -21,6 +21,19 @@ func NewBucketsController(bucketsService BucketsService) *bucketsController {
 func (c *bucketsController) Routes(r *gin.RouterGroup) {
 	r.GET("", c.Get)
 	r.PUT("", c.Put)
+	r.GET("/all", c.GetAll)
+}
+
+func (c *bucketsController) GetAll(ctx *gin.Context) {
+	res := response.New(ctx)
+
+	buckets := c.bucketsService.GetAll()
+
+	if buckets == nil {
+		buckets = []models.Bucket{}
+	}
+
+	res.SetData(buckets).JSON()
 }
 
 func (c *bucketsController) Get(ctx *gin.Context) {
