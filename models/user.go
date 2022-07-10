@@ -49,11 +49,16 @@ func matchUserQuery(user User, query *UserQuery) bool {
 }
 
 func generateUserId() string {
-	bytes := make([]byte, 21)
+	rand.Seed(time.Now().UnixNano())
 
-	rand.Read(bytes)
+	alphabets := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	bytes := make([]rune, 21)
 
-	return fmt.Sprintf("ga-%x", bytes)
+	for i := range bytes {
+		bytes[i] = alphabets[rand.Intn(len(alphabets))]
+	}
+
+	return fmt.Sprintf("ga-%x", string(bytes))
 }
 
 func (m *model) getUsers() []User {
