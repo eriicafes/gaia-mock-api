@@ -14,7 +14,7 @@ const UserResource = "users"
 type User struct {
 	ID        filedb.ID `json:"id"`
 	Name      string    `json:"name"`
-	AccountID string    `json:"accountId"`
+	AccountID string    `json:"username"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
